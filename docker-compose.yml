@@ -1,0 +1,60 @@
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: lynxicart
+    ports:
+      - "3307:3306"
+    networks:
+      - springboot-mysql-react-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+     test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p$MYSQL_ROOT_PASSWORD"]
+     interval: 10s
+     timeout: 5s
+     retries: 5
+ 
+  springboot-app:
+    image: springboot-backend  # Replace with your actual image name
+    container_name: springboot-app
+    depends_on:
+     db:
+       condition: service_healthy
+    ports:
+      - 8086:8086
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/lynxicart
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - springboot-mysql-react-network
+    restart: unless-stopped
+    volumes:
+      - ./src/main/resources/application.properties:/app/config/application.properties
+
+  react-app:
+   image: react-frontend
+   container_name: react-app
+   depends_on:
+    - springboot-app
+   ports:
+    - 3000:3000 
+   networks:
+    - springboot-mysql-react-network
+   restart: unless-stopped
+   
+networks:
+  springboot-mysql-react-network:
+
+volumes:
+  mysql-data:
+
+
+
+
+
