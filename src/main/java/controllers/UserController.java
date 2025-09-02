@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,7 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import services.LoginService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RequestMapping("/api")
 public class UserController {
 
@@ -35,6 +38,9 @@ public class UserController {
 	private AdminUserService adminuserservice;
 	
 	BCryptPasswordEncoder passwordencoder = new BCryptPasswordEncoder();
+	
+	@Value("${frontend.url}")
+    private String frontendUrl;
 
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@RequestBody User user) {
@@ -56,24 +62,27 @@ public class UserController {
 	public ResponseEntity<?> registeredUser(@RequestBody LoginRequest login, HttpServletResponse response) {
 
 		try {
-			
-			Optional<User> userent = loginservice.registeredUser(login);
+		    Optional<User> userent = loginservice.registeredUser(login);
 
-			String token = loginservice.generateToken(userent.get());
+		    String token = loginservice.generateToken(userent.get());
 
-			Cookie cookie = new Cookie("authtoken", token);
-			cookie.setHttpOnly(true);
-			cookie.setMaxAge(3600);
-			cookie.setPath("/");
-			cookie.setSecure(false);
-			response.addCookie(cookie);
+		    // Use Spring ResponseCookie (supports SameSite)
+		    	ResponseCookie cookie = ResponseCookie.from("authtoken", token)
+		            .httpOnly(true)              // prevent JS access
+		            .secure(true)                // required for SameSite=None
+		            .sameSite("None")            // explicitly allow cross-site
+		            .path("/")
+		            .maxAge(3600)                // 1 hour
+		            .build();
 
-			Map<String, Object> responsebody = new HashMap<>();
+		    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-			responsebody.put("message", "Login Successfull");
-			responsebody.put("role", userent.get().getRole());
+		    Map<String, Object> responsebody = new HashMap<>();
+		    responsebody.put("message", "Login Successful");
+		    responsebody.put("role", userent.get().getRole());
 
-			return ResponseEntity.ok(responsebody);
+		    return ResponseEntity.ok(responsebody);
+		
 
 		} catch (RuntimeException e) {
 

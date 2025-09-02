@@ -145,13 +145,6 @@ public class LoginService {
 		tokenrepository.save(jwtToken);
 	}
 	
-	public void deleteToken(User user) {
-		
-		
-	}
-		
-		
-	
 
 	public void logout(User user) {
 		tokenrepository.deleteByUserid(user.getUser_id());

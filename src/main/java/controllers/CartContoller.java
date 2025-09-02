@@ -23,7 +23,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import services.CartService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RequestMapping("/api/cart")
 public class CartContoller {
 

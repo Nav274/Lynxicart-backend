@@ -22,8 +22,7 @@ import entities.User;
 import entities.Userdetails;
 import jakarta.servlet.http.HttpServletRequest;
 
-@RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RestController 
 @RequestMapping("/admin/user")
 public class AdminUserController {
 	

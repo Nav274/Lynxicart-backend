@@ -23,12 +23,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import repositories.ProductRepository;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RequestMapping("/admin/product")
 public class AdminProductController {
 	
 	private final AdminProductService productservice;
-	
+
 
 	public AdminProductController(AdminProductService productservice) {
 		

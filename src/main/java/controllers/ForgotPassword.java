@@ -27,7 +27,7 @@ import repositories.UserRepository;
 import services.OtpGeneration;
 
 @RestController
-@CrossOrigin(origins="http://localhost:3000", allowCredentials="true")
+//@CrossOrigin(origins="http://localhost:3000", allowCredentials="true")
 @RequestMapping("/forgotpass")
 public class ForgotPassword {
 	
